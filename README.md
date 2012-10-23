@@ -2,7 +2,7 @@
 Dryly bind and unbind event listeners and encourage consistent,
 pattern-based naming of handlers/callbacks.
 
-[![Build Status](https://secure.travis-ci.org/arbales/observation.coffee.png)](http://travis-ci.org/arbales/observation.coffee)
+[![Build Status](https://secure.travis-ci.org/arbales/dry-observer.png)](http://travis-ci.org/arbales/dry-observer)
 
 ```coffeescript
 # Observe a Model by passing a hash…
