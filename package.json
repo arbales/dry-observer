@@ -1,16 +1,20 @@
 {
-  "name":        "dry-observer",
-  "version":     "0.0.1",
-  "author":      "arbales",
-  "keywords":    "events observer backbone eventemitter",
+  "name": "dry-observer",
+  "version": "0.1.0",
+  "author": "arbales",
+  "keywords": [
+    "events observer backbone eventemitter"
+  ],
   "description": "A utility to setup DRY event listeners.",
-  "licenses":     [{
-    "type":       "MIT",
-    "url":        "http://github.com/arbales/dry-observer/raw/master/LICENSE"
-  }],
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/arbales/dry-observer.git"
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://github.com/arbales/dry-observer/raw/master/LICENSE"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arbales/dry-observer.git"
   },
   "dependencies": {
     "underscore": "latest"
@@ -23,5 +27,9 @@
   "scripts": {
     "test": "mocha ./test/observer.coffee --require coffee-script --require should"
   },
-  "main": "./observer.coffee"
+  "main": "./observer.coffee",
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  }
 }
