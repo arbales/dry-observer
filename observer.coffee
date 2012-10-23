@@ -1,10 +1,13 @@
-# Observers
-# v0.1.0
+###
+dry-observer
+v0.1.1
+###
 
-if !_ and require
-  _ = require 'underscore'
-else
-  throw "Observers requires Underscore.js"
+root = this
+_ = root._
+
+if (!_ && require?)
+  _ = require('underscore')
 
 # InvalidBindingError is thrown when an object does not
 # implement a handler method.
@@ -21,6 +24,13 @@ class InvalidBindingError extends Error
 capitalize = (string) ->
   return "" unless string
   string.charAt(0).toUpperCase() + string.slice(1)
+
+# Internal: Backport Backbone's `#on` and `#off` methods to
+# older Backbone objects.
+aliasDeprecatedBackboneMethods = (object) ->
+   object.off = object.unbind
+   object.on = object.bind
+
 
 Observers =
   # Internal: An array of objects for which `#observe`
@@ -61,14 +71,19 @@ Observers =
   # Raises InvalidBindingError if an implicit handler function could not be found.
   observe: (target, events...) ->
 
+    if Backbone? && parseFloat(Backbone.VERSION) < 0.9 and !@on
+      aliasDeprecatedBackboneMethods(target)
+
+    @_eventHandlerPrefix ||= 'on'
+
     if events.length is 1
 
       if (_ events[0]).isString()
         events = events[0].split(" ")
-      
+
       if (_ events[0]).isObject()
         events = events[0]
-         
+
     # If only strings were passed, intuit proper handler
     # names, and verify that they exist at runtime.
     #
@@ -78,7 +93,7 @@ Observers =
         # Determine event handlers based on the event name.
         [action, scope] = e.split(':')
         # `send:task` -> `onSendTask`
-        handler = ["on", capitalize(action), capitalize(scope)].join('')
+        handler = [@_eventHandlerPrefix, capitalize(action), capitalize(scope)].join('')
         # If the handler function does not exist, bail out of
         # binding and throw an error.
         handler = @[handler] || throw new InvalidBindingError(e, handler)
@@ -118,7 +133,6 @@ Observers =
       @stopObserving target for target in @_observedObjects
     events = @_observers[target.cid]
     for own event, handlers of events
-            
       for handler, index in handlers
         if target.removeListener
           target.removeListener(event, handler)

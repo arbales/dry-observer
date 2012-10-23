@@ -1,6 +1,6 @@
 {
   "name": "dry-observer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "arbales",
   "keywords": [
     "events observer backbone eventemitter"
@@ -27,7 +27,7 @@
   "scripts": {
     "test": "mocha ./test/observer.coffee --require coffee-script --require should"
   },
-  "main": "./observer.coffee",
+  "main": "./observer.js",
   "optionalDependencies": {},
   "engines": {
     "node": "*"
