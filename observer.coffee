@@ -1,6 +1,11 @@
 # Observers
 # v0.1.0
 
+if !_ and require
+  _ = require 'underscore'
+else
+  throw "Observers requires Underscore.js"
+
 # InvalidBindingError is thrown when an object does not
 # implement a handler method.
 #
@@ -55,15 +60,19 @@ Observers =
   # Returns nothing.
   # Raises InvalidBindingError if an implicit handler function could not be found.
   observe: (target, events...) ->
-    if _.isString(events[0]) and events.length is 1
-      events = events[0].split(" ")
 
-    # If an array of events was passed, we should intuit proper handler
+    if events.length is 1
+
+      if (_ events[0]).isString()
+        events = events[0].split(" ")
+      
+      if (_ events[0]).isObject()
+        events = events[0]
+         
+    # If only strings were passed, intuit proper handler
     # names, and verify that they exist at runtime.
     #
-    if _.isObject(events[0])
-      events = events[0]
-    else if _.isString(events[0])
+    if _.isString(events[0])
       parsedEvents = {}
       _.each events, (e) =>
         # Determine event handlers based on the event name.
@@ -75,14 +84,15 @@ Observers =
         handler = @[handler] || throw new InvalidBindingError(e, handler)
         parsedEvents[e] = handler
       events = parsedEvents
-    else
+
+    unless _.isObject(events)
       throw new TypeError "Observe accepts either a String, an Array of Strings, or an Object."
 
     # Target objects must have a CID for use registering events.
     target.cid = _.uniqueId('observed') unless target.cid
 
     # Create or append to the list of observed objects.
-    (@_observedObjects ||= []).push target
+    @_observedObjects = _.union (@_observedObjects ||= []), target
 
     # Conditionally create a hash of events that will be registered
     # by this call to observe.
@@ -108,11 +118,14 @@ Observers =
       @stopObserving target for target in @_observedObjects
     events = @_observers[target.cid]
     for own event, handlers of events
+            
       for handler, index in handlers
-        target.off event, handler
-        events[event][index] = null
-        delete events[event][index]
-        false
+        if target.removeListener
+          target.removeListener(event, handler)
+        else
+          target.off(event, handler)
+        [handlers][index] = null
+        delete [handlers][index]
 
 
     # Remove the target object from the list of observed objects.
@@ -138,7 +151,6 @@ Observers =
         target.off event, handler
         events[event][index] = null
         delete events[event][index]
-        false
 
     true
 

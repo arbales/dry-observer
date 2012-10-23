@@ -1,4 +1,4 @@
-## Observation
+## dry-observer
 Dryly bind and unbind event listeners and encourage consistent,
 pattern-based naming of handlers/callbacks.
 
@@ -71,7 +71,7 @@ class TaskDetail extends App.View
     @observe @model, 'change:closed focus position:updated assignee:reset'
 ```
 
-To fully leverage the usefullness of Observation, dreate a base subclass
+To fully leverage the usefullness of Observation, create a base subclass
 of Backbone.View you can use to ensure that event listeners
 *always* get cleaned up upon view removal.
 

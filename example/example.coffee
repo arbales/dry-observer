@@ -3,6 +3,13 @@ App = {}
 
 # Your Base view could automatically support. 
 class App.View extends Backbone.View
+
+  initialize: ->
+    # For safety, you might want to bind these functions to your
+    # your instance. You shouldn't call #stopObserving in a different
+    # context, it'd be unable to properly detach events.
+    _.bindAll @, 'observe', 'stopObserving'
+
   # Your Backbone.View subclass might call `#stopObserving` when
   # its removed to destory references between your view and the 
   # other objects its observing.
