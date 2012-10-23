@@ -1,6 +1,6 @@
 _              = require 'underscore'
 {EventEmitter} = require 'events'
-{Observers}     = require '../observation'
+{Observers}     = require '../observer'
 
 class TestEmitter extends EventEmitter
   constructor: ->
