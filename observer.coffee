@@ -1,6 +1,6 @@
 ###
 dry-observer
-v0.1.2
+v0.1.3
 
 LICENSE: http://github.com/arbales/dry-observer/raw/master/LICENSE
 ###
@@ -32,7 +32,6 @@ capitalize = (string) ->
 aliasDeprecatedBackboneMethods = (object) ->
    object.off = object.unbind
    object.on = object.bind
-
 
 Observers =
   # Internal: An array of objects for which `#observe`
@@ -90,9 +89,6 @@ Observers =
     # if the last element is an object, its the context
     else if _.isObject(_.last(events))
       context = events.pop()
-
-    if context and !Backbone?
-      throw TypeError "Unexpected argument: context"
 
     # If only strings were passed, intuit proper handler
     # names, and verify that they exist at runtime.
