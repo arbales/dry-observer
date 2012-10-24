@@ -1,6 +1,6 @@
 {
   "name": "dry-observer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": "arbales",
   "keywords": [
     "events observer backbone eventemitter"

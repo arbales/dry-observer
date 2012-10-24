@@ -1,6 +1,8 @@
 ###
 dry-observer
-v0.1.1
+v0.1.2
+
+LICENSE: http://github.com/arbales/dry-observer/raw/master/LICENSE
 ###
 
 root = this
@@ -71,18 +73,26 @@ Observers =
   # Raises InvalidBindingError if an implicit handler function could not be found.
   observe: (target, events...) ->
 
+    context = null
+
     if Backbone? && parseFloat(Backbone.VERSION) < 0.9 and !@on
       aliasDeprecatedBackboneMethods(target)
 
     @_eventHandlerPrefix ||= 'on'
 
     if events.length is 1
-
       if (_ events[0]).isString()
         events = events[0].split(" ")
 
       if (_ events[0]).isObject()
         events = events[0]
+
+    # if the last element is an object, its the context
+    else if _.isObject(_.last(events))
+      context = events.pop()
+
+    if context and !Backbone?
+      throw TypeError "Unexpected argument: context"
 
     # If only strings were passed, intuit proper handler
     # names, and verify that they exist at runtime.
@@ -116,7 +126,7 @@ Observers =
     # Create event listeners for each event and handler specified.
     #
     for own event, handler of events
-      target.on event, handler
+      target.on event, handler, context
       (targetEvents[event] ||= []).push handler
 
     true
@@ -138,12 +148,11 @@ Observers =
           target.removeListener(event, handler)
         else
           target.off(event, handler)
-        [handlers][index] = null
         delete [handlers][index]
 
 
     # Remove the target object from the list of observed objects.
-    @_observedObjects.pop(target)
+    delete @_observedObjects[_.indexOf(@_observedObjects, target)]
     delete @_observers[target.cid]
 
     true
