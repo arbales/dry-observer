@@ -1,6 +1,6 @@
 ###
 dry-observer
-v0.2.1
+v0.2.2
 
 LICENSE: http://github.com/arbales/dry-observer/raw/master/LICENSE
 ###
