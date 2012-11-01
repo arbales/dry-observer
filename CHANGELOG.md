@@ -1,6 +1,7 @@
 # Initial Release (Oct. 22. 2012)
 
 ## 0.2.0
+
 * You can now pass a space-separated list of events inside a hash paired
   with a single event handler. This matches Backbone's `#on` method, and
   allows you to bind multiple thigns to `#render` for example.
@@ -18,3 +19,8 @@
 
 * Backbone 0.9.0+ compatible objects will now receive the "context"
   parameter during binding.
+
+## 0.2.1
+
+* Prevent infinite loop when `#stopObserving` is called without a target
+  `@_observedObjects` is emptyish.

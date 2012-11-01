@@ -1,6 +1,6 @@
 ###
 dry-observer
-v0.2.0
+v0.2.1
 
 LICENSE: http://github.com/arbales/dry-observer/raw/master/LICENSE
 ###
@@ -167,9 +167,12 @@ Observers =
   # removed. (Optional)
   #
   # Returns nothing.
-  stopObserving: (target) ->
+  stopObserving: (target = false) ->
+    return false unless @_observedObjects && @_observers
     unless target
-      @stopObserving target for target in @_observedObjects
+      for target in @_observedObjects
+        @stopObserving target if target
+      return false
     events = @_observers[target.cid]
     for own event, handlers of events
       for handler, index in handlers
