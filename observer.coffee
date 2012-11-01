@@ -1,6 +1,6 @@
 ###
 dry-observer
-v0.1.3
+v0.2.0
 
 LICENSE: http://github.com/arbales/dry-observer/raw/master/LICENSE
 ###
@@ -27,11 +27,47 @@ capitalize = (string) ->
   return "" unless string
   string.charAt(0).toUpperCase() + string.slice(1)
 
-# Internal: Backport Backbone's `#on` and `#off` methods to
-# older Backbone objects.
-aliasDeprecatedBackboneMethods = (object) ->
-   object.off = object.unbind
-   object.on = object.bind
+deprecatedBackbone = Backbone? && parseFloat(Backbone.VERSION) < 0.9
+
+eventSplitter = /\s+/
+
+createListener = (target, events, callback, context) ->
+  # EventEmitter
+  if target.addListener
+    for event in events.split(eventSplitter)
+      target.addListener(event, callback)
+
+  # Backbone < 0.9.0
+  else if deprecatedBackbone
+    for event in events.split(eventSplitter)
+      target.bind(event, callback, context)
+
+  # Backbone >= 0.9.0, Backbone-compatible objects
+  else if target.on
+    target.on(events, handler, context)
+  else
+    throw new TypeError "Expected an EventEmitter or Backbone.Events-compatible target."
+
+
+# Internal: Use the Backbone 0.9.0 interface for unbinding
+# events for EventEmitter and all versions of Backbone.
+#
+destroyListener = (target, events, callback) ->
+  # EventEmitter
+  if target.removeListener
+    for event in events.split(eventSplitter)
+      target.removeListener(event, callback)
+
+  # Backbone < 0.9.0
+  else if deprecatedBackbone
+    for event in events.split(eventSplitter)
+      target.unbind(event, callback)
+
+  # Backbone >= 0.9.0, Backbone-compatible objects
+  else if target.off
+    target.off(events, handler)
+  else
+    throw new TypeError "Expected an EventEmitter or Backbone.Events-compatible target."
 
 Observers =
   # Internal: An array of objects for which `#observe`
@@ -74,9 +110,6 @@ Observers =
 
     context = null
 
-    if Backbone? && parseFloat(Backbone.VERSION) < 0.9 and !@on
-      aliasDeprecatedBackboneMethods(target)
-
     @_eventHandlerPrefix ||= 'on'
 
     if events.length is 1
@@ -102,7 +135,7 @@ Observers =
         handler = [@_eventHandlerPrefix, capitalize(action), capitalize(scope)].join('')
         # If the handler function does not exist, bail out of
         # binding and throw an error.
-        handler = @[handler] || throw new InvalidBindingError(e, handler)
+        handler = @[handler] || @[e] || throw new InvalidBindingError(e, handler)
         parsedEvents[e] = handler
       events = parsedEvents
 
@@ -122,7 +155,7 @@ Observers =
     # Create event listeners for each event and handler specified.
     #
     for own event, handler of events
-      target.on event, handler, context
+      createListener target, event, handler, context
       (targetEvents[event] ||= []).push handler
 
     true
@@ -140,12 +173,8 @@ Observers =
     events = @_observers[target.cid]
     for own event, handlers of events
       for handler, index in handlers
-        if target.removeListener
-          target.removeListener(event, handler)
-        else
-          target.off(event, handler)
+        destroyListener target, event, handler
         delete [handlers][index]
-
 
     # Remove the target object from the list of observed objects.
     delete @_observedObjects[_.indexOf(@_observedObjects, target)]
