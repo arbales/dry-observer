@@ -23,6 +23,11 @@ pattern-based naming of handlers/callbacks.
 
 # …or remove a specific handler and cleanup.
 @removeObserver model, 'song:change', @onSongChange
+
+# You can even pass multiple events per callback…
+@observe collection, 
+  'add remove reset': @render
+
 ```
 
 ### Problem
