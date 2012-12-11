@@ -44,7 +44,7 @@ createListener = (target, events, callback, context) ->
 
   # Backbone >= 0.9.0, Backbone-compatible objects
   else if target.on
-    target.on(events, handler, context)
+    target.on(events, callback, context)
   else
     throw new TypeError "Expected an EventEmitter or Backbone.Events-compatible target."
 
@@ -65,7 +65,7 @@ destroyListener = (target, events, callback) ->
 
   # Backbone >= 0.9.0, Backbone-compatible objects
   else if target.off
-    target.off(events, handler)
+    target.off(events, callback)
   else
     throw new TypeError "Expected an EventEmitter or Backbone.Events-compatible target."
 
